@@ -5,36 +5,39 @@ import (
 	"fmt"
 
 	sdk "gitee.com/openeuler/go-gitee/gitee"
+	libconfig "github.com/opensourceways/robot-gitee-plugin-lib/config"
 	"github.com/opensourceways/robot-gitee-plugin-lib/giteeclient"
 	libplugin "github.com/opensourceways/robot-gitee-plugin-lib/plugin"
 	libutils "github.com/opensourceways/robot-gitee-plugin-lib/utils"
 	"github.com/sirupsen/logrus"
 )
 
+const pluginName = "checkpr"
+
 type cpClient interface {
 	UpdatePullRequest(org, repo string, number int32, param sdk.PullRequestUpdateParam) (sdk.PullRequest, error)
-	GetGiteePullRequest(org, repo string, number int) (sdk.PullRequest, error)
-	GetPRCommits(org, repo string, number int) ([]sdk.PullRequestCommits, error)
-	AddPRLabel(org, repo string, number int, label string) error
-	RemovePRLabel(org, repo string, number int, label string) error
+	GetGiteePullRequest(org, repo string, number int32) (sdk.PullRequest, error)
+	GetPRCommits(org, repo string, number int32) ([]sdk.PullRequestCommits, error)
+	AddPRLabel(org, repo string, number int32, label string) error
+	RemovePRLabel(org, repo string, number int32, label string) error
 }
 
 type checkPr struct {
-	ghc cpClient
+	ghc   cpClient
+	clear func()
 }
 
-func newCheckPr(gec cpClient) libplugin.Plugin {
-	return &checkPr{gec}
+func newCheckPr(gec cpClient, clear func()) libplugin.Plugin {
+	return &checkPr{gec, clear}
 }
 
 func (cp *checkPr) Exit() {
+	if cp.clear != nil {
+		cp.clear()
+	}
 }
 
-func (cp *checkPr) PluginName() string {
-	return "checkpr"
-}
-
-func (cp *checkPr) NewPluginConfig() libplugin.PluginConfig {
+func (cp *checkPr) NewPluginConfig() libconfig.PluginConfig {
 	return &configuration{}
 }
 
@@ -42,7 +45,7 @@ func (cp *checkPr) RegisterEventHandler(p libplugin.HandlerRegitster) {
 	p.RegisterPullRequestHandler(cp.handlePREvent)
 }
 
-func (cp *checkPr) handlePREvent(e *sdk.PullRequestEvent, cfg libplugin.PluginConfig, log *logrus.Entry) error {
+func (cp *checkPr) handlePREvent(e *sdk.PullRequestEvent, cfg libconfig.PluginConfig, log *logrus.Entry) error {
 	action := giteeclient.GetPullRequestAction(e)
 	if action == giteeclient.PRActionClosed {
 		return nil
@@ -56,7 +59,7 @@ func (cp *checkPr) handlePREvent(e *sdk.PullRequestEvent, cfg libplugin.PluginCo
 	prInfo := giteeclient.GetPRInfoByPREvent(e)
 	pc := config.CheckPRFor(prInfo.Org, prInfo.Repo)
 	if pc == nil {
-		return fmt.Errorf("no %s plugin config for this repo:%s/%s", cp.PluginName(), prInfo.Org, prInfo.Repo)
+		return fmt.Errorf("no %s plugin config for this repo:%s/%s", pluginName, prInfo.Org, prInfo.Repo)
 	}
 
 	mr := libutils.NewMultiErrors()
@@ -96,7 +99,7 @@ func (cp *checkPr) removeMinNumReviewerAndTester(prInfo giteeclient.PRInfo, cfg 
 	return err
 }
 
-func (cp *checkPr) pluginConfig(cfg libplugin.PluginConfig) (*configuration, error) {
+func (cp *checkPr) pluginConfig(cfg libconfig.PluginConfig) (*configuration, error) {
 	c, ok := cfg.(*configuration)
 	if !ok {
 		return nil, errors.New("can't convert to configuration")

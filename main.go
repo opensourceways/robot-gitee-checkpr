@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 
 	"github.com/opensourceways/robot-gitee-plugin-lib/giteeclient"
 	"github.com/opensourceways/robot-gitee-plugin-lib/logrusutil"
 	liboptions "github.com/opensourceways/robot-gitee-plugin-lib/options"
 	libplugin "github.com/opensourceways/robot-gitee-plugin-lib/plugin"
+	"github.com/opensourceways/robot-gitee-plugin-lib/secret"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,20 +36,21 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 }
 
 func main() {
-	logrusutil.ComponentInit()
+	logrusutil.ComponentInit(pluginName)
 
 	o := gatherOptions(flag.NewFlagSet(os.Args[0], flag.ExitOnError), os.Args[1:]...)
 	if err := o.Validate(); err != nil {
 		logrus.WithError(err).Fatal("Invalid options")
 	}
 
-	token, err := ioutil.ReadFile(o.gitee.TokenPath)
-	if err != nil {
-		logrus.WithError(err).Fatal("Invalid token path")
+	secretAgent := new(secret.Agent)
+	if err := secretAgent.Start([]string{o.gitee.TokenPath}); err != nil {
+		logrus.WithError(err).Fatal("Error starting secret agent.")
 	}
-	c := giteeclient.NewClient(func() []byte {
-		return token
-	})
 
-	libplugin.Run(newCheckPr(c), o.plugin)
+	c := giteeclient.NewClient(secretAgent.GetTokenGenerator(o.gitee.TokenPath))
+
+	p := newCheckPr(c, func() { secretAgent.Stop() })
+
+	libplugin.Run(p, o.plugin)
 }
