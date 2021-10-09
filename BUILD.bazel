@@ -1,5 +1,6 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("//:def.bzl", "build_image", "push_image", "image_tags")
 
 # gazelle:prefix github.com/opensourceways/robot-gitee-plugin-checkpr
 gazelle(name = "gazelle")
@@ -30,4 +31,18 @@ go_binary(
     name = "robot-gitee-plugin-checkpr",
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
+)
+
+build_image(
+    name = "image",
+    base = "@git-base//image",
+    visibility = ["//visibility:public"],
+)
+
+push_image(
+    name = "image-push",
+    bundle_name = "release",
+    images = image_tags(
+        target = "//:image"
+    ),
 )
