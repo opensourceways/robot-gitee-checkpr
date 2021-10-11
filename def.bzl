@@ -32,6 +32,7 @@ def build_image(
         name = name,
         base = ":" + app_name,
         stamp = stamp,
+        entrypoint = ["/app/app.binary"],
         **kwargs
     )
 
