@@ -1,6 +1,6 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@bazel_gazelle//:def.bzl", "gazelle")
-load("//:def.bzl", "build_image", "push_image", "image_tags")
+load("@github_opensourceways_robot_gitee_plugin_lib//:deps.bzl","build_image", "push_image", "image_tags")
 
 # gazelle:prefix github.com/opensourceways/robot-gitee-plugin-checkpr
 gazelle(name = "gazelle")

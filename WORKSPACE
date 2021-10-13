@@ -25,7 +25,13 @@ load("@io_bazel_rules_docker//go:image.bzl", _go_repositories = "repositories")
 
 _go_repositories()
 
-load("//:def.bzl", "containers")
+git_repository(
+    name = "github_opensourceways_robot_gitee_plugin_lib",
+    remote = "git@github.com:opensourceways/robot-gitee-plugin-lib.git",
+    branch = "master"
+)
+
+load("@github_opensourceways_robot_gitee_plugin_lib//:deps.bzl","containers")
 
 containers()
 

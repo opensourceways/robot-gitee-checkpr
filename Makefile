@@ -32,12 +32,12 @@ clean:
 
 .PHONY: image
 
-image: image
+image:
 	$(call tips,Build Image)
 	$(bazel) run //:image --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64
 
 .PHONY: image-push
 
-image-push: image-push
+image-push:
 	$(call tips,Push Image)
 	$(bazel) run //:image-push --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64
