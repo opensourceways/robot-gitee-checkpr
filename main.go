@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"github.com/opensourceways/robot-gitee-plugin-lib/giteeclient"
-	"github.com/opensourceways/robot-gitee-plugin-lib/logrusutil"
-	liboptions "github.com/opensourceways/robot-gitee-plugin-lib/options"
-	libplugin "github.com/opensourceways/robot-gitee-plugin-lib/plugin"
-	"github.com/opensourceways/robot-gitee-plugin-lib/secret"
+	"github.com/opensourceways/community-robot-lib/giteeclient"
+	libplugin "github.com/opensourceways/community-robot-lib/giteeplugin"
+	"github.com/opensourceways/community-robot-lib/logrusutil"
+	liboptions "github.com/opensourceways/community-robot-lib/options"
+	"github.com/opensourceways/community-robot-lib/secret"
 	"github.com/sirupsen/logrus"
 )
 

@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	sdk "gitee.com/openeuler/go-gitee/gitee"
-	libconfig "github.com/opensourceways/robot-gitee-plugin-lib/config"
-	"github.com/opensourceways/robot-gitee-plugin-lib/giteeclient"
-	libplugin "github.com/opensourceways/robot-gitee-plugin-lib/plugin"
-	libutils "github.com/opensourceways/robot-gitee-plugin-lib/utils"
+	libconfig "github.com/opensourceways/community-robot-lib/config"
+	"github.com/opensourceways/community-robot-lib/giteeclient"
+	libplugin "github.com/opensourceways/community-robot-lib/giteeplugin"
+	libutils "github.com/opensourceways/community-robot-lib/utils"
 	"github.com/sirupsen/logrus"
 )
 
