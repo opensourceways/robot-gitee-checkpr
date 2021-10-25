@@ -1,4 +1,4 @@
-module github.com/opensourceways/robot-gitee-plugin-checkpr
+module github.com/opensourceways/robot-gitee-checkpr
 
 go 1.16
 

@@ -2,12 +2,12 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@github_opensourceways_community_robot_lib//:image.bzl", "build_plugin_image", "push_image", "image_tags")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
-# gazelle:prefix github.com/opensourceways/robot-gitee-plugin-checkpr
+# gazelle:prefix github.com/opensourceways/robot-gitee-checkpr
 gazelle(name = "gazelle")
 
 build_plugin_image(
     name = "image",
-    plugin = "robot-gitee-plugin-checkpr",
+    plugin = "robot-gitee-checkpr",
 )
 
 push_image(
@@ -24,7 +24,7 @@ go_library(
         "config.go",
         "main.go",
     ],
-    importpath = "github.com/opensourceways/robot-gitee-plugin-checkpr",
+    importpath = "github.com/opensourceways/robot-gitee-checkpr",
     visibility = ["//visibility:private"],
     deps = [
         "@com_gitee_openeuler_go_gitee//gitee:go_default_library",
@@ -40,7 +40,7 @@ go_library(
 )
 
 go_binary(
-    name = "robot-gitee-plugin-checkpr",
+    name = "robot-gitee-checkpr",
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
 )
