@@ -3,46 +3,52 @@ package main
 import libconfig "github.com/opensourceways/community-robot-lib/config"
 
 type configuration struct {
-	Checkpr []pluginConfig `json:"checkpr,omitempty"`
+	ConfigItems []botConfig `json:"config_items,omitempty"`
 }
 
-func (c *configuration) Validate() error {
-	if c != nil {
-		cs := c.Checkpr
-		for i := range cs {
-			if err := cs[i].Validate(); err != nil {
-				return err
-			}
-		}
+func (c *configuration) configFor(org, repo string) *botConfig {
+	if c == nil {
+		return nil
+	}
+
+	items := c.ConfigItems
+	v := make([]libconfig.IPluginForRepo, len(items))
+	for i := range items {
+		v[i] = &items[i]
+	}
+
+	if i := libconfig.FindConfig(org, repo, v); i >= 0 {
+		return &items[i]
 	}
 	return nil
 }
 
-func (c *configuration) CheckPRFor(org, repo string) *pluginConfig {
+func (c *configuration) Validate() error {
 	if c == nil {
 		return nil
 	}
-	cs := c.Checkpr
-	v := make([]libconfig.IPluginForRepo, 0, len(cs))
-	for i := range cs {
-		v = append(v, &cs[i])
-	}
-	if i := libconfig.FindConfig(org, repo, v); i >= 0 {
-		return &cs[i]
+
+	items := c.ConfigItems
+	for i := range items {
+		if err := items[i].validate(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func (c *configuration) SetDefault() {
-	if c != nil {
-		cs := c.Checkpr
-		for i := range cs {
-			cs[i].setDefault()
-		}
+	if c == nil {
+		return
+	}
+
+	Items := c.ConfigItems
+	for i := range Items {
+		Items[i].setDefault()
 	}
 }
 
-type pluginConfig struct {
+type botConfig struct {
 	libconfig.PluginForRepo
 
 	// NoNeedResetReviewerTester whether to reset the number of reviewers and  testers when the PR is turned on
@@ -57,16 +63,20 @@ type pluginConfig struct {
 	SquashCommitLabel string `json:"squash_commit_label,omitempty"`
 }
 
-func (c *pluginConfig) setDefault() {
+func (c *botConfig) setDefault() {
 	if c.SquashCommitLabel == "" {
 		c.SquashCommitLabel = "stat/needs-squash"
 	}
 }
 
-func (c pluginConfig) needResetReviewerAndTester() bool {
+func (c *botConfig) validate() error {
+	return c.PluginForRepo.Validate()
+}
+
+func (c *botConfig) needResetReviewerAndTester() bool {
 	return !c.NoNeedResetReviewerTester
 }
 
-func (c pluginConfig) needCheckCommits() bool {
+func (c *botConfig) needCheckCommits() bool {
 	return c.CommitsThreshold > 0
 }

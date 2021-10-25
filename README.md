@@ -1,1 +1,1 @@
-# robot-gitee-plugin-checkpr
+# robot-gitee-checkpr

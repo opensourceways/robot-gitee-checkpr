@@ -36,7 +36,7 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 }
 
 func main() {
-	logrusutil.ComponentInit(pluginName)
+	logrusutil.ComponentInit(botName)
 
 	o := gatherOptions(flag.NewFlagSet(os.Args[0], flag.ExitOnError), os.Args[1:]...)
 	if err := o.Validate(); err != nil {
@@ -50,7 +50,9 @@ func main() {
 
 	c := giteeclient.NewClient(secretAgent.GetTokenGenerator(o.gitee.TokenPath))
 
-	p := newCheckPr(c, func() { secretAgent.Stop() })
+	p := newRobot(c)
 
 	libplugin.Run(p, o.plugin)
+
+	secretAgent.Stop()
 }

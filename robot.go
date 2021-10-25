@@ -12,9 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const pluginName = "checkpr"
+const botName = "checkpr"
 
-type cpClient interface {
+type iClient interface {
 	UpdatePullRequest(org, repo string, number int32, param sdk.PullRequestUpdateParam) (sdk.PullRequest, error)
 	GetGiteePullRequest(org, repo string, number int32) (sdk.PullRequest, error)
 	GetPRCommits(org, repo string, number int32) ([]sdk.PullRequestCommits, error)
@@ -22,53 +22,53 @@ type cpClient interface {
 	RemovePRLabel(org, repo string, number int32, label string) error
 }
 
-type checkPr struct {
-	ghc   cpClient
-	clear func()
+func newRobot(cli iClient) *robot {
+	return &robot{cli: cli}
 }
 
-func newCheckPr(gec cpClient, clear func()) libplugin.Plugin {
-	return &checkPr{gec, clear}
+type robot struct {
+	cli iClient
 }
 
-func (cp *checkPr) Exit() {
-	if cp.clear != nil {
-		cp.clear()
-	}
-}
-
-func (cp *checkPr) NewPluginConfig() libconfig.PluginConfig {
+func (bot *robot) NewPluginConfig() libconfig.PluginConfig {
 	return &configuration{}
 }
 
-func (cp *checkPr) RegisterEventHandler(p libplugin.HandlerRegitster) {
-	p.RegisterPullRequestHandler(cp.handlePREvent)
+func (bot *robot) getConfig(cfg libconfig.PluginConfig) (*configuration, error) {
+	if c, ok := cfg.(*configuration); ok {
+		return c, nil
+	}
+	return nil, errors.New("can't convert to configuration")
 }
 
-func (cp *checkPr) handlePREvent(e *sdk.PullRequestEvent, cfg libconfig.PluginConfig, log *logrus.Entry) error {
+func (bot *robot) RegisterEventHandler(p libplugin.HandlerRegitster) {
+	p.RegisterPullRequestHandler(bot.handlePREvent)
+}
+
+func (bot *robot) handlePREvent(e *sdk.PullRequestEvent, cfg libconfig.PluginConfig, log *logrus.Entry) error {
 	action := giteeclient.GetPullRequestAction(e)
 	if action == giteeclient.PRActionClosed {
 		return nil
 	}
 
-	config, err := cp.pluginConfig(cfg)
+	config, err := bot.getConfig(cfg)
 	if err != nil {
 		return err
 	}
 
 	prInfo := giteeclient.GetPRInfoByPREvent(e)
-	pc := config.CheckPRFor(prInfo.Org, prInfo.Repo)
+	pc := config.configFor(prInfo.Org, prInfo.Repo)
 	if pc == nil {
-		return fmt.Errorf("no %s plugin config for this repo:%s/%s", pluginName, prInfo.Org, prInfo.Repo)
+		return fmt.Errorf("no %s plugin config for this repo:%s/%s", botName, prInfo.Org, prInfo.Repo)
 	}
 
 	mr := libutils.NewMultiErrors()
-	if err := cp.removeMinNumReviewerAndTester(prInfo, pc); err != nil {
+	if err := bot.removeMinNumReviewerAndTester(prInfo, pc); err != nil {
 		mr.AddError(err)
 	}
 
 	if action == giteeclient.PRActionOpened || action == giteeclient.PRActionChangedSourceBranch {
-		if err := cp.handleCheckCommits(prInfo, pc); err != nil {
+		if err := bot.handleCheckCommits(prInfo, pc); err != nil {
 			mr.AddError(err)
 		}
 
@@ -76,7 +76,7 @@ func (cp *checkPr) handlePREvent(e *sdk.PullRequestEvent, cfg libconfig.PluginCo
 	return mr.Err()
 }
 
-func (cp *checkPr) removeMinNumReviewerAndTester(prInfo giteeclient.PRInfo, cfg *pluginConfig) error {
+func (bot *robot) removeMinNumReviewerAndTester(prInfo giteeclient.PRInfo, cfg *botConfig) error {
 	if !cfg.needResetReviewerAndTester() {
 		return nil
 	}
@@ -85,7 +85,7 @@ func (cp *checkPr) removeMinNumReviewerAndTester(prInfo giteeclient.PRInfo, cfg 
 	repo := prInfo.Repo
 	number := prInfo.Number
 
-	pr, err := cp.ghc.GetGiteePullRequest(org, repo, number)
+	pr, err := bot.cli.GetGiteePullRequest(org, repo, number)
 	if err != nil {
 		return err
 	}
@@ -95,24 +95,16 @@ func (cp *checkPr) removeMinNumReviewerAndTester(prInfo giteeclient.PRInfo, cfg 
 
 	changeNum := int32(0)
 	param := sdk.PullRequestUpdateParam{AssigneesNumber: &changeNum, TestersNumber: &changeNum}
-	_, err = cp.ghc.UpdatePullRequest(org, repo, int32(number), param)
+	_, err = bot.cli.UpdatePullRequest(org, repo, int32(number), param)
 	return err
 }
 
-func (cp *checkPr) pluginConfig(cfg libconfig.PluginConfig) (*configuration, error) {
-	c, ok := cfg.(*configuration)
-	if !ok {
-		return nil, errors.New("can't convert to configuration")
-	}
-	return c, nil
-}
-
-func (cp *checkPr) handleCheckCommits(prInfo giteeclient.PRInfo, cfg *pluginConfig) error {
+func (bot *robot) handleCheckCommits(prInfo giteeclient.PRInfo, cfg *botConfig) error {
 	if !cfg.needCheckCommits() {
 		return nil
 	}
 
-	commits, err := cp.ghc.GetPRCommits(prInfo.Org, prInfo.Repo, prInfo.Number)
+	commits, err := bot.cli.GetPRCommits(prInfo.Org, prInfo.Repo, prInfo.Number)
 	if err != nil {
 		return err
 	}
@@ -121,11 +113,11 @@ func (cp *checkPr) handleCheckCommits(prInfo giteeclient.PRInfo, cfg *pluginConf
 	hasSquashLabel := prInfo.HasLabel(cfg.SquashCommitLabel)
 
 	if exceeded && !hasSquashLabel {
-		return cp.ghc.AddPRLabel(prInfo.Org, prInfo.Repo, prInfo.Number, cfg.SquashCommitLabel)
+		return bot.cli.AddPRLabel(prInfo.Org, prInfo.Repo, prInfo.Number, cfg.SquashCommitLabel)
 	}
 
 	if !exceeded && hasSquashLabel {
-		return cp.ghc.RemovePRLabel(prInfo.Org, prInfo.Repo, prInfo.Number, cfg.SquashCommitLabel)
+		return bot.cli.RemovePRLabel(prInfo.Org, prInfo.Repo, prInfo.Number, cfg.SquashCommitLabel)
 	}
 
 	return nil
