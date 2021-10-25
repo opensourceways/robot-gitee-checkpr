@@ -1,6 +1,6 @@
 package main
 
-import libconfig "github.com/opensourceways/robot-gitee-plugin-lib/config"
+import libconfig "github.com/opensourceways/community-robot-lib/config"
 
 type configuration struct {
 	Checkpr []pluginConfig `json:"checkpr,omitempty"`
