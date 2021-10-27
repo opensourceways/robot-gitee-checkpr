@@ -109,7 +109,7 @@ func (bot *robot) handleCheckCommits(prInfo giteeclient.PRInfo, cfg *botConfig) 
 		return err
 	}
 
-	exceeded := len(commits) > cfg.CommitsThreshold
+	exceeded := uint(len(commits)) > cfg.CommitsThreshold
 	hasSquashLabel := prInfo.HasLabel(cfg.SquashCommitLabel)
 
 	if exceeded && !hasSquashLabel {

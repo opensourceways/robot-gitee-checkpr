@@ -57,13 +57,17 @@ type botConfig struct {
 	// CommitsThreshold Check the threshold of the number of PR commits,
 	// and add the label specified by SquashCommitLabel to the PR if this value is exceeded.
 	// zero means no check.
-	CommitsThreshold int `json:"commits_threshold,omitempty"`
+	CommitsThreshold uint `json:"commits_threshold,omitempty"`
 
 	// SquashCommitLabel Specify the label whose PR exceeds the threshold. default: stat/needs-squash
 	SquashCommitLabel string `json:"squash_commit_label,omitempty"`
 }
 
 func (c *botConfig) setDefault() {
+	if c.CommitsThreshold == 0 {
+		c.CommitsThreshold = 1
+	}
+
 	if c.SquashCommitLabel == "" {
 		c.SquashCommitLabel = "stat/needs-squash"
 	}
