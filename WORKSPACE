@@ -526,8 +526,8 @@ go_repository(
 go_repository(
     name = "com_github_opensourceways_community_robot_lib",
     importpath = "github.com/opensourceways/community-robot-lib",
-    sum = "h1:oJtEs6JIr5mWsy10w+P5th7r9K/uH1Xfq/ygqV2gPZw=",
-    version = "v0.0.0-20211025040745-03b1f878d6a8",
+    sum = "h1:wqFjQWBHRVUb8o1LmWkvU6eyVYNDSwTzLUghf41uJME=",
+    version = "v0.0.0-20211215030644-f6bf2fc9c367",
 )
 
 go_repository(
@@ -855,15 +855,15 @@ go_repository(
 go_repository(
     name = "org_golang_x_net",
     importpath = "golang.org/x/net",
-    sum = "h1:ADo5wSpq2gqaCGQWzk7S5vd//0iyyLeAratkEoG5dLE=",
-    version = "v0.0.0-20210520170846-37e1c6afe023",
+    sum = "h1:WtYZ93XtWSO5KlOMgPZu7hXY9WhMZpprvlm5VwvAl8c=",
+    version = "v0.0.0-20211201190559-0a0e4e1bb54c",
 )
 
 go_repository(
     name = "org_golang_x_oauth2",
     importpath = "golang.org/x/oauth2",
-    sum = "h1:Qmd2pbz05z7z6lm0DrgQVVPuBm92jqujBKMHMOlOQEw=",
-    version = "v0.0.0-20210819190943-2bc19b11175f",
+    sum = "h1:RerP+noqYHUQ8CMRcPlC2nvTa4dcBIjegkuWdcUDuqg=",
+    version = "v0.0.0-20211104180415-d3ed0bb246c8",
 )
 
 go_repository(
@@ -913,4 +913,11 @@ go_repository(
     importpath = "golang.org/x/xerrors",
     sum = "h1:go1bK/D/BFZV2I8cIQd1NKEZ+0owSTG1fDTci4IqFcE=",
     version = "v0.0.0-20200804184101-5ec99f83aff1",
+)
+
+go_repository(
+    name = "com_github_opensourceways_go_gitee",
+    importpath = "github.com/opensourceways/go-gitee",
+    sum = "h1:9c6nbXjoSoSzzZVGzYp8pwP8pjZozdyBny4tTfwsnzg=",
+    version = "v0.0.0-20211215060819-f7e8cdf464a2",
 )
