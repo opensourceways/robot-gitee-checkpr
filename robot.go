@@ -36,8 +36,8 @@ func (bot *robot) getConfig(cfg config.Config) (*configuration, error) {
 	return nil, errors.New("can't convert to configuration")
 }
 
-func (bot *robot) RegisterEventHandler(p framework.HandlerRegitster) {
-	p.RegisterPullRequestHandler(bot.handlePREvent)
+func (bot *robot) RegisterEventHandler(f framework.HandlerRegitster) {
+	f.RegisterPullRequestHandler(bot.handlePREvent)
 }
 
 func (bot *robot) handlePREvent(e *sdk.PullRequestEvent, c config.Config, log *logrus.Entry) error {
@@ -53,7 +53,7 @@ func (bot *robot) handlePREvent(e *sdk.PullRequestEvent, c config.Config, log *l
 	org, repo := e.GetOrgRepo()
 
 	if config.configFor(org, repo) == nil {
-		return fmt.Errorf("no %s plugin config for this repo:%s/%s", botName, org, repo)
+		return fmt.Errorf("no config for this repo:%s/%s", org, repo)
 	}
 
 	pr := e.GetPullRequest()
