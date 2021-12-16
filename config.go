@@ -1,6 +1,6 @@
 package main
 
-import libconfig "github.com/opensourceways/community-robot-lib/config"
+import "github.com/opensourceways/community-robot-lib/config"
 
 type configuration struct {
 	ConfigItems []botConfig `json:"config_items,omitempty"`
@@ -12,12 +12,12 @@ func (c *configuration) configFor(org, repo string) *botConfig {
 	}
 
 	items := c.ConfigItems
-	v := make([]libconfig.IPluginForRepo, len(items))
+	v := make([]config.IRepoFilter, len(items))
 	for i := range items {
 		v[i] = &items[i]
 	}
 
-	if i := libconfig.FindConfig(org, repo, v); i >= 0 {
+	if i := config.Find(org, repo, v); i >= 0 {
 		return &items[i]
 	}
 	return nil
@@ -49,38 +49,12 @@ func (c *configuration) SetDefault() {
 }
 
 type botConfig struct {
-	libconfig.PluginForRepo
-
-	// NoNeedResetReviewerTester whether to reset the number of reviewers and  testers when the PR is turned on
-	NoNeedResetReviewerTester bool `json:"no_need_reset_reviewer_tester,omitempty"`
-
-	// CommitsThreshold Check the threshold of the number of PR commits,
-	// and add the label specified by SquashCommitLabel to the PR if this value is exceeded.
-	// zero means no check.
-	CommitsThreshold uint `json:"commits_threshold,omitempty"`
-
-	// SquashCommitLabel Specify the label whose PR exceeds the threshold. default: stat/needs-squash
-	SquashCommitLabel string `json:"squash_commit_label,omitempty"`
+	config.RepoFilter
 }
 
 func (c *botConfig) setDefault() {
-	if c.CommitsThreshold == 0 {
-		c.CommitsThreshold = 1
-	}
-
-	if c.SquashCommitLabel == "" {
-		c.SquashCommitLabel = "stat/needs-squash"
-	}
 }
 
 func (c *botConfig) validate() error {
-	return c.PluginForRepo.Validate()
-}
-
-func (c *botConfig) needResetReviewerAndTester() bool {
-	return !c.NoNeedResetReviewerTester
-}
-
-func (c *botConfig) needCheckCommits() bool {
-	return c.CommitsThreshold > 0
+	return c.RepoFilter.Validate()
 }
