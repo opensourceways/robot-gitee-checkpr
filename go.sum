@@ -161,11 +161,10 @@ github.com/onsi/ginkgo v1.14.0/go.mod h1:iSB4RoI2tjJc9BBv4NKIKWKya62Rps+oPG/Lv9k
 github.com/onsi/gomega v0.0.0-20170829124025-dcabb60a477c/go.mod h1:C1qb7wdrVGGVU+Z6iS04AVkA3Q65CEZX59MT0QO5uiA=
 github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
-github.com/opensourceways/community-robot-lib v0.0.0-20211215030644-f6bf2fc9c367 h1:wqFjQWBHRVUb8o1LmWkvU6eyVYNDSwTzLUghf41uJME=
-github.com/opensourceways/community-robot-lib v0.0.0-20211215030644-f6bf2fc9c367/go.mod h1:zC55zfN6oCVADKI7UFs3yUIx4TpbBl1WfkuYyfJXE3Y=
-github.com/opensourceways/go-gitee v0.0.0-20211203025325-e887d1b1f4ae/go.mod h1:j9pTi02Chw2l1ZphAIjS3/i41NWX8K6DZX5JWf044Og=
-github.com/opensourceways/go-gitee v0.0.0-20211215060819-f7e8cdf464a2 h1:9c6nbXjoSoSzzZVGzYp8pwP8pjZozdyBny4tTfwsnzg=
-github.com/opensourceways/go-gitee v0.0.0-20211215060819-f7e8cdf464a2/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
+github.com/opensourceways/community-robot-lib v0.0.0-20220106023803-5440edf1bb49 h1:Sg5NYbzlD6h1jrPtVRAZmGduLYkaiaiJ26Dv5h9MSy0=
+github.com/opensourceways/community-robot-lib v0.0.0-20220106023803-5440edf1bb49/go.mod h1:7Ed0TgvJBN6UaXnHwHRqZGCfg6SYpqe5mi6esCKaD1g=
+github.com/opensourceways/go-gitee v0.0.0-20211230094517-effa55336a8b h1:xkMOH8c39WYn60h271MHrxJrA8trgX0DHZSLOE4lFAI=
+github.com/opensourceways/go-gitee v0.0.0-20211230094517-effa55336a8b/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
