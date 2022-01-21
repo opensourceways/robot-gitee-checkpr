@@ -40,7 +40,7 @@ func (bot *robot) RegisterEventHandler(f framework.HandlerRegitster) {
 }
 
 func (bot *robot) handlePREvent(e *sdk.PullRequestEvent, c config.Config, log *logrus.Entry) error {
-	if sdk.GetPullRequestAction(e) == sdk.PRActionClosed {
+	if sdk.GetPullRequestAction(e) == sdk.ActionClose {
 		return nil
 	}
 
